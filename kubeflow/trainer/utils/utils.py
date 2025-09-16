@@ -477,8 +477,56 @@ def get_args_using_torchtune_config(
         else:
             args.append(f"dataset.data_dir={os.path.join(constants.DATASET_PATH, relative_path)}")
 
+    if fine_tuning_config.peft_config:
+        args.append(constants.TORCH_TUNE_USE_LORA)
+        args += get_args_in_peft_config(fine_tuning_config.peft_config)
+
     if fine_tuning_config.dataset_preprocess_config:
         args += get_args_in_dataset_preprocess_config(fine_tuning_config.dataset_preprocess_config)
+
+    return args
+
+
+def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
+    """
+    Get the args from the given PEFT config.
+    """
+    args = []
+
+    if not isinstance(peft_config, types.LoraConfig):
+        raise ValueError(f"Invalid PEFT config type: {type(peft_config)}.")
+
+    # Override the apply_lora_to_mlp field if it is provided.
+    if peft_config.apply_lora_to_mlp:
+        args.append(f"model.apply_lora_to_mlp={peft_config.apply_lora_to_mlp}")
+
+    # Override the apply_lora_to_output field if it is provided.
+    if peft_config.apply_lora_to_output:
+        args.append(f"model.apply_lora_to_output={peft_config.apply_lora_to_output}")
+
+    # Override the lora_attn_modules field if it is provided.
+    if peft_config.lora_attn_modules:
+        args.append(f'model.lora_attn_modules="[{",".join(peft_config.lora_attn_modules)}]"')
+
+    # Override the lora_rank field if it is provided.
+    if peft_config.lora_rank:
+        args.append(f"model.lora_rank={peft_config.lora_rank}")
+
+    # Override the lora_alpha field if it is provided.
+    if peft_config.lora_alpha:
+        args.append(f"model.lora_alpha={peft_config.lora_alpha}")
+
+    # Override the lora_dropout field if it is provided.
+    if peft_config.lora_dropout:
+        args.append(f"model.lora_dropout={peft_config.lora_dropout}")
+
+    # Override the quantize_base field if it is provided.
+    if peft_config.quantize_base:
+        args.append(f"model.quantize_base={peft_config.quantize_base}")
+
+    # Override the use_dora field if it is provided.
+    if peft_config.use_dora:
+        args.append(f"model.use_dora={peft_config.use_dora}")
 
     return args
 
