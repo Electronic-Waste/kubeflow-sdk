@@ -505,7 +505,7 @@ def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
 
     # Override the lora_attn_modules field if it is provided.
     if peft_config.lora_attn_modules:
-        args.append(f'model.lora_attn_modules="[{",".join(peft_config.lora_attn_modules)}]"')
+        args.append(f"model.lora_attn_modules=[{','.join(peft_config.lora_attn_modules)}]")
 
     # Override the lora_rank field if it is provided.
     if peft_config.lora_rank:
