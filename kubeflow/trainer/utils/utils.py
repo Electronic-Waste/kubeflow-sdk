@@ -478,7 +478,6 @@ def get_args_using_torchtune_config(
             args.append(f"dataset.data_dir={os.path.join(constants.DATASET_PATH, relative_path)}")
 
     if fine_tuning_config.peft_config:
-        args.append(constants.TORCH_TUNE_USE_LORA)
         args += get_args_in_peft_config(fine_tuning_config.peft_config)
 
     if fine_tuning_config.dataset_preprocess_config:
@@ -521,12 +520,19 @@ def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
         args.append(f"model.lora_dropout={peft_config.lora_dropout}")
 
     # Override the quantize_base field if it is provided.
-    if peft_config.quantize_base:
+    # If `quantize_base` is set and `use_dora` not, QLoRA is applied and we do not need this arg.
+    if peft_config.quantize_base and peft_config.use_dora:
         args.append(f"model.quantize_base={peft_config.quantize_base}")
 
     # Override the use_dora field if it is provided.
     if peft_config.use_dora:
         args.append(f"model.use_dora={peft_config.use_dora}")
+
+    # Add the flag for using LoRA/QLoRA/DoRA.
+    if peft_config.quantize_base and not peft_config.use_dora:
+        args.append(constants.TORCH_TUNE_USE_QLORA)
+    else:
+        args.append(constants.TORCH_TUNE_USE_LORA)
 
     return args
 

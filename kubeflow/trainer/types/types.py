@@ -132,6 +132,7 @@ class LoraConfig:
         lora_dropout (`Optional[float]`):
             The probability of applying Dropout to the low rank updates.
         quantize_base (`Optional[bool]`): Whether to enable model quantization.
+            If True, QLoRA is applied. But if `use_dora` is also set to True, DoRA is applied.
         use_dora (`Optional[bool]`): Whether to enable DoRA.
     """
 
