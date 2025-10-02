@@ -138,7 +138,7 @@ class LoraConfig:
 
     apply_lora_to_mlp: Optional[bool] = None
     apply_lora_to_output: Optional[bool] = None
-    lora_attn_modules: Optional[list[str]] = None
+    lora_attn_modules: Optional[list[str]] = ["q_proj", "v_proj", "output_proj"]
     lora_rank: Optional[int] = None
     lora_alpha: Optional[int] = None
     lora_dropout: Optional[float] = None

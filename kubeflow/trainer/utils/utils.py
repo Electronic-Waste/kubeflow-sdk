@@ -501,6 +501,7 @@ def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
         "lora_rank": "model.lora_rank",
         "lora_alpha": "model.lora_alpha",
         "lora_dropout": "model.lora_dropout",
+        "quantize_base": "model.quantize_base",
         "use_dora": "model.use_dora",
     }
 
@@ -510,16 +511,9 @@ def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
         if value:
             args.append(f"{arg_name}={value}")
 
-    # Override the quantize_base field if it is provided.
-    # If `quantize_base` is set and `use_dora` not, QLoRA is applied and we do not need this arg.
-    if peft_config.quantize_base and peft_config.use_dora:
-        args.append(f"model.quantize_base={peft_config.quantize_base}")
-
-    # Add the flag for using LoRA/QLoRA/DoRA.
-    if peft_config.quantize_base and not peft_config.use_dora:
-        args.append(constants.TORCH_TUNE_USE_QLORA)
-    else:
-        args.append(constants.TORCH_TUNE_USE_LORA)
+    # Override the LoRA attention modules if they are provided.
+    if peft_config.lora_attn_modules:
+        args.append(f"model.lora_attn_modules=[{','.join(peft_config.lora_attn_modules)}]")
 
     return args
 

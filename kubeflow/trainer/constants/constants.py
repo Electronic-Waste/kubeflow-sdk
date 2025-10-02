@@ -171,9 +171,3 @@ TORCH_TUNE_COMMAND = ("tune", "run")
 
 # The Instruct Datasets class in torchtune
 TORCH_TUNE_INSTRUCT_DATASET = "torchtune.datasets.instruct_dataset"
-
-# The flag for the LoRA/DoRA method in torchtune.
-TORCH_TUNE_USE_LORA = "--trainer-use-lora"
-
-# The flag for the QLoRA method in torchtune.
-TORCH_TUNE_USE_QLORA = "--trainer-use-qlora"
