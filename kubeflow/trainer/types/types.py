@@ -121,7 +121,8 @@ class LoraConfig:
         apply_lora_to_output (`Optional[bool]`):
             Whether to apply LoRA to the model's final output projection.
         lora_attn_modules (`Optional[list[str]]`):
-            A list of strings specifying which layers of the model to apply LoRA:
+            A list of strings specifying which layers of the model to apply LoRA,
+            default is ["q_proj", "v_proj", "output_proj"]:
             1. "q_proj" applies LoRA to the query projection layer.
             2. "k_proj" applies LoRA to the key projection layer.
             3. "v_proj" applies LoRA to the value projection layer.
@@ -138,7 +139,9 @@ class LoraConfig:
 
     apply_lora_to_mlp: Optional[bool] = None
     apply_lora_to_output: Optional[bool] = None
-    lora_attn_modules: Optional[list[str]] = ["q_proj", "v_proj", "output_proj"]
+    lora_attn_modules: Optional[list[str]] = field(
+        default_factory=lambda: ["q_proj", "v_proj", "output_proj"]
+    )
     lora_rank: Optional[int] = None
     lora_alpha: Optional[int] = None
     lora_dropout: Optional[float] = None
