@@ -495,38 +495,25 @@ def get_args_in_peft_config(peft_config: types.LoraConfig) -> list[str]:
     if not isinstance(peft_config, types.LoraConfig):
         raise ValueError(f"Invalid PEFT config type: {type(peft_config)}.")
 
-    # Override the apply_lora_to_mlp field if it is provided.
-    if peft_config.apply_lora_to_mlp:
-        args.append(f"model.apply_lora_to_mlp={peft_config.apply_lora_to_mlp}")
+    field_map = {
+        "apply_lora_to_mlp": "model.apply_lora_to_mlp",
+        "apply_lora_to_output": "model.apply_lora_to_output",
+        "lora_rank": "model.lora_rank",
+        "lora_alpha": "model.lora_alpha",
+        "lora_dropout": "model.lora_dropout",
+        "use_dora": "model.use_dora",
+    }
 
-    # Override the apply_lora_to_output field if it is provided.
-    if peft_config.apply_lora_to_output:
-        args.append(f"model.apply_lora_to_output={peft_config.apply_lora_to_output}")
-
-    # Override the lora_attn_modules field if it is provided.
-    if peft_config.lora_attn_modules:
-        args.append(f"model.lora_attn_modules=[{','.join(peft_config.lora_attn_modules)}]")
-
-    # Override the lora_rank field if it is provided.
-    if peft_config.lora_rank:
-        args.append(f"model.lora_rank={peft_config.lora_rank}")
-
-    # Override the lora_alpha field if it is provided.
-    if peft_config.lora_alpha:
-        args.append(f"model.lora_alpha={peft_config.lora_alpha}")
-
-    # Override the lora_dropout field if it is provided.
-    if peft_config.lora_dropout:
-        args.append(f"model.lora_dropout={peft_config.lora_dropout}")
+    # Override the PEFT fields if they are provided.
+    for field, arg_name in field_map.items():
+        value = getattr(peft_config, field, None)
+        if value:
+            args.append(f"{arg_name}={value}")
 
     # Override the quantize_base field if it is provided.
     # If `quantize_base` is set and `use_dora` not, QLoRA is applied and we do not need this arg.
     if peft_config.quantize_base and peft_config.use_dora:
         args.append(f"model.quantize_base={peft_config.quantize_base}")
-
-    # Override the use_dora field if it is provided.
-    if peft_config.use_dora:
-        args.append(f"model.use_dora={peft_config.use_dora}")
 
     # Add the flag for using LoRA/QLoRA/DoRA.
     if peft_config.quantize_base and not peft_config.use_dora:
